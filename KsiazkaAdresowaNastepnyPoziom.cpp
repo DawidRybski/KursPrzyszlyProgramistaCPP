@@ -22,8 +22,8 @@ bool comparePeopleId(const Person &a, const Person &b);
 string readLine();
 char readChar();
 int readInt();
-int addPerson(vector <Person> &people, int peopleNumber);
-int readPeopleFromFile(vector <Person> &people);
+void addPerson(vector <Person> &people);
+void readPeopleFromFile(vector <Person> &people);
 void overrideFile (vector <Person> &people);
 void showPeopleByName (vector <Person> &people);
 void showPeopleBySurname (vector <Person> &people);
@@ -38,7 +38,7 @@ int main()
     bool run = true;
     char choice;
 
-    peopleNumber = readPeopleFromFile(people);
+    readPeopleFromFile(people);
 
     system("cls");
     while (run)
@@ -59,7 +59,7 @@ int main()
         {
             case '1':
                 system("cls");
-                peopleNumber = addPerson(people, peopleNumber);
+                addPerson(people);
                 break;
             case '2':
                 system("cls");
@@ -141,7 +141,7 @@ int readInt()
     return number;
 }
 
-int addPerson(vector <Person> &people, int peopleNumber)
+void addPerson(vector <Person> &people)
 {
     string name, surname, phoneNumber, email, address;
     cout << "Podaj imie:";
@@ -156,26 +156,33 @@ int addPerson(vector <Person> &people, int peopleNumber)
     address = readLine();
 
     Person newPerson;
-    int id = 1;
-    bool idTaken = false;
-    bool idAssigned = false;
-    while (!idAssigned)
+//    int id = 1;
+//    bool idTaken = false;
+//    bool idAssigned = false;
+//    while (!idAssigned)
+//    {
+//        idTaken = false;
+//
+//        for (Person &person : people)
+//        {
+//            if (person.id == id)
+//            {
+//                idTaken = true;
+//                break;
+//            }
+//        }
+//        if (!idTaken)
+//        {
+//            newPerson.id = id;
+//            idAssigned = true;
+//        } else id++;
+//    }
+    if (people.empty())
     {
-        idTaken = false;
-
-        for (Person &person : people)
-        {
-            if (person.id == id)
-            {
-                idTaken = true;
-                break;
-            }
-        }
-        if (!idTaken)
-        {
-            newPerson.id = id;
-            idAssigned = true;
-        } else id++;
+        newPerson.id = 1;
+    } else
+    {
+        newPerson.id = people.back().id + 1;
     }
     newPerson.name = name;
     newPerson.surname = surname;
@@ -188,11 +195,11 @@ int addPerson(vector <Person> &people, int peopleNumber)
 
     overrideFile(people);
     cout << endl << "Osoba zostala dodana" << endl; system("pause");
-    return peopleNumber + 1;
+//    return peopleNumber + 1;
 }
 
 
-int readPeopleFromFile(vector <Person> &people)
+void readPeopleFromFile(vector <Person> &people)
 {
     people.clear();
     string line = "";
@@ -225,8 +232,6 @@ int readPeopleFromFile(vector <Person> &people)
         people.push_back(person);
     }
     file.close();
-
-    return people.size();
 }
 
 void overrideFile (vector <Person> &people)
