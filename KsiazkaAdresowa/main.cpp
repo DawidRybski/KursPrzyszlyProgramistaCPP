@@ -38,9 +38,9 @@ int readInt();
 void addPerson(vector <Person> &people, int loggedUserId);
 void readPeopleFromFile(vector <Person> &people);
 void overridePeopleFile (vector <Person> &people);
-void showPeopleByName (vector <Person> &people);
-void showPeopleBySurname (vector <Person> &people);
-void showPeopleList (vector <Person> &people);
+void showPeopleByName (vector <Person> &people, int loggedUserId);
+void showPeopleBySurname (vector <Person> &people, int loggedUserId);
+void showPeopleList (vector <Person> &people, int loggedUserId);
 void erasePerson (vector <Person> &people);
 void editPerson (vector <Person> &people);
 
@@ -108,15 +108,15 @@ int main()
                     break;
                 case '2':
                     system("cls");
-                    showPeopleByName(people);
+                    showPeopleByName(people, loggedUserId);
                     break;
                 case '3':
                     system("cls");
-                    showPeopleBySurname(people);
+                    showPeopleBySurname(people, loggedUserId);
                     break;
                 case '4':
                     system("cls");
-                    showPeopleList(people);
+                    showPeopleList(people, loggedUserId);
                     break;
                 case '5':
                     system("cls");
@@ -274,7 +274,7 @@ void overrideUsersFile (vector <User> &users)
         {
             file << user.id << "|";
             file << user.username << "|";
-            file << user.password << "|";
+            file << user.password << endl;
         }
         file.close();
     }
@@ -437,7 +437,7 @@ void overridePeopleFile (vector <Person> &people)
     }
 }
 
-void showPeopleByName (vector <Person> &people)
+void showPeopleByName (vector <Person> &people, int loggedUserId)
 {
     int nameCount = 0;
     cout << "Podaj imie adresata: ";
@@ -445,7 +445,7 @@ void showPeopleByName (vector <Person> &people)
 
     for (Person person: people)
     {
-        if (person.name == searchedName)
+        if (person.name == searchedName && person.userId == loggedUserId)
         {
             cout << person.id << endl;
             cout << person.name << endl;
@@ -464,7 +464,7 @@ void showPeopleByName (vector <Person> &people)
     system("pause");
 }
 
-void showPeopleBySurname (vector <Person> &people)
+void showPeopleBySurname (vector <Person> &people, int loggedUserId)
 {
     int surnameCount = 0;
     cout << "Podaj nazwisko adresata: ";
@@ -472,7 +472,7 @@ void showPeopleBySurname (vector <Person> &people)
 
     for (Person person: people)
     {
-        if (person.surname == searchedSurname)
+        if (person.surname == searchedSurname && person.userId == loggedUserId)
         {
             cout << person.id << endl;
             cout << person.name << endl;
@@ -491,12 +491,14 @@ void showPeopleBySurname (vector <Person> &people)
     system("pause");
 }
 
-void showPeopleList (vector <Person> &people)
+void showPeopleList (vector <Person> &people, int loggedUserId)
 {
     int peopleCount = 0;
 
     for (Person person: people)
     {
+        if (person.userId == loggedUserId)
+        {
             cout << "Id: " << person.id << endl;
             cout << "Imie: " << person.name << endl;
             cout << "Nazwisko: " << person.surname << endl;
@@ -504,6 +506,7 @@ void showPeopleList (vector <Person> &people)
             cout << "email: " << person.email << endl;
             cout << "Adres: " << person.address << endl << endl;
             peopleCount++;
+        }
     }
 
     if (peopleCount == 0)
