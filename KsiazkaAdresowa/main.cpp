@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <windows.h>
 
 using namespace std;
 
@@ -18,13 +19,24 @@ struct Person
     string address;
 };
 
+struct User
+{
+    int id;
+    string username, password;
+};
+
+void registration(vector <User> &users);
+int login(vector <User> &users, int usersNumber);
+void changePassword(vector <User> &users, int usersNumber, int loggedUserId);
+void readUsersFromFile(vector <User> &users);
+void overrideUsersFile (vector <User> &users);
 bool comparePeopleId(const Person &a, const Person &b);
 string readLine();
 char readChar();
 int readInt();
 void addPerson(vector <Person> &people);
 void readPeopleFromFile(vector <Person> &people);
-void overrideFile (vector <Person> &people);
+void overridePeopleFile (vector <Person> &people);
 void showPeopleByName (vector <Person> &people);
 void showPeopleBySurname (vector <Person> &people);
 void showPeopleList (vector <Person> &people);
@@ -34,60 +46,241 @@ void editPerson (vector <Person> &people);
 int main()
 {
     vector <Person> people;
+    vector <User> users;
+    int loggedUserId = 0;
+    int usersNumber = 0;
     int peopleNumber = 0;
     bool run = true;
     char choice;
-
-    readPeopleFromFile(people);
+    readUsersFromFile(users);
 
     system("cls");
     while (run)
     {
-        cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
-        cout << "1. Dodaj adresata" << endl;
-        cout << "2. Wyszukaj po imieniu" << endl;
-        cout << "3. Wyszukaj po nazwisku" << endl;
-        cout << "4. Wyswietl wszystkich adresatow" << endl;
-        cout << "5. Usun adresata" << endl;
-        cout << "6. Edytuj adresata" << endl;
-        cout << "9. Zakoncz program" << endl << endl;
-        cout << "Twoj wybor: ";
-
-
-        choice = readChar();
-        switch(choice)
+        if (loggedUserId == 0)
         {
-            case '1':
-                system("cls");
-                addPerson(people);
-                break;
-            case '2':
-                system("cls");
-                showPeopleByName(people);
-                break;
-            case '3':
-                system("cls");
-                showPeopleBySurname(people);
-                break;
-            case '4':
-                system("cls");
-                showPeopleList(people);
-                break;
-            case '5':
-                system("cls");
-                erasePerson(people);
-                break;
-            case '6':
-                system("cls");
-                editPerson(people);
-                break;
-            case '9':
-                run = false;
-                break;
-        }
+            system("cls");
+            cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
+            cout << "1. Rejestracja" << endl;
+            cout << "2. Logowanie" << endl;
+            cout << "9. Zakoncz program" << endl;
+            cout << "Twoj wybor: ";
 
+            choice = readChar();
+
+            if (choice == '1')
+            {
+                registration(users);
+            }
+            else if (choice == '2')
+            {
+                loggedUserId = login(users, usersNumber);
+            }
+            else if (choice == '9')
+            {
+                exit(0);
+            }
+        }
+        else
+        {
+            readPeopleFromFile(people);
+            system("cls");
+            cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
+            cout << "1. Dodaj adresata" << endl;
+            cout << "2. Wyszukaj po imieniu" << endl;
+            cout << "3. Wyszukaj po nazwisku" << endl;
+            cout << "4. Wyswietl wszystkich adresatow" << endl;
+            cout << "5. Usun adresata" << endl;
+            cout << "6. Edytuj adresata" << endl;
+            cout << "7. Zmiana hasla" << endl;
+            cout << "8. Wyloguj sie" << endl;
+            cout << "9. Zakoncz program" << endl << endl;
+            cout << "Twoj wybor: ";
+            choice = readChar();
+
+            switch(choice)
+            {
+                case '1':
+                    system("cls");
+                    addPerson(people);
+                    break;
+                case '2':
+                    system("cls");
+                    showPeopleByName(people);
+                    break;
+                case '3':
+                    system("cls");
+                    showPeopleBySurname(people);
+                    break;
+                case '4':
+                    system("cls");
+                    showPeopleList(people);
+                    break;
+                case '5':
+                    system("cls");
+                    erasePerson(people);
+                    break;
+                case '6':
+                    system("cls");
+                    editPerson(people);
+                    break;
+                case '7':
+                    system("cls");
+                    changePassword(users, usersNumber, loggedUserId);
+                    break;
+                case '8':
+                    system("cls");
+                    loggedUserId = 0;
+                    break;
+                case '9':
+                    run = false;
+                    break;
+            }
+
+        }
     }
+}
+
+void registration(vector <User> &users)
+{
+    string username, password;
+
+    cout << "Podaj nazwe uzytkownika: ";
+    username = readLine();
+
+    for (const auto& u : users)
+    {
+        if (u.username == username)
+        {
+            cout << "Taki uzytkownik juz istnieje. Rejestracja anulowana." << endl;
+            Sleep(2000);
+            return;
+        }
+    }
+
+
+    cout << "Podaj password: ";
+    password = readLine();
+
+    User newUser;
+    newUser.id = users.empty() ? 1 : users.back().id + 1;
+    newUser.username = username;
+    newUser.password = password;
+
+
+    users.push_back(newUser);
+
+    overrideUsersFile(users);
+
+    cout << "Konto zalozone" << endl;
+    Sleep(1000);
+}
+
+int login(vector <User> &users, int usersNumber)
+{
+    string username, password;
+    cout << "Podaj login: ";
+    username = readLine();
+
+    for (const auto& u : users)
+    {
+        if (u.username == username)
+        {
+            for (int attempts = 0; attempts < 3; attempts++)
+            {
+                cout << "Podaj password. Pozostalo prob: " << 3 - attempts << ": ";
+                password = readLine();
+
+                if (u.password == password)
+                {
+                    cout << "Zalogowales sie." << endl;
+                    Sleep(1000);
+                    return u.id;
+                }
+            }
+
+            cout << "3 nieudane attempts. Zaczekaj 3 sekundy." << endl;
+            Sleep(3000);
+            return 0;
+        }
+    }
+
+    cout << "Nie ma uzytkownika z takim loginem." << endl;
+    Sleep(2000);
     return 0;
+}
+
+void changePassword(vector <User> &users, int usersNumber, int loggedUserId)
+{
+    string password;
+    cout << "Podaj nowe password: ";
+    password = readLine();
+
+    for (auto& u : users)
+    {
+        if (u.id == loggedUserId)
+        {
+            u.password = password;
+            cout << "Haslo zostalo zmienione." << endl;
+            overrideUsersFile(users);
+            Sleep(2000);
+            return;
+        }
+    }
+}
+
+void readUsersFromFile(vector <User> &users)
+{
+    users.clear();
+    string line = "";
+
+    fstream file;
+    file.open("Uzytkownicy.txt", ios::in);
+
+    User user;
+    string data = "";
+
+    while(getline(file, line))
+    {
+        int nextData = 0;
+        stringstream ss(line);
+
+        while (getline(ss, data, '|'))
+        {
+            switch (nextData)
+            {
+                case 0: user.id = stoi(data); break;
+                case 1: user.username = data; break;
+                case 2: user.password = data;
+            }
+            nextData++;
+            data = "";
+        }
+        users.push_back(user);
+    }
+    file.close();
+}
+
+void overrideUsersFile (vector <User> &users)
+{
+    fstream file;
+    file.open("Uzytkownicy.txt", ios::out);
+
+    if (file.good())
+    {
+        for (User &user : users)
+        {
+            file << user.id << "|";
+            file << user.username << "|";
+            file << user.password << endl;
+        }
+        file.close();
+    }
+    else
+    {
+        cout << "Nie udalo sie otworzyc pliku do zapisu." << endl;
+        system("pause");
+    }
 }
 
 bool comparePeopleId(const Person &a, const Person &b)
@@ -156,27 +349,6 @@ void addPerson(vector <Person> &people)
     address = readLine();
 
     Person newPerson;
-//    int id = 1;
-//    bool idTaken = false;
-//    bool idAssigned = false;
-//    while (!idAssigned)
-//    {
-//        idTaken = false;
-//
-//        for (Person &person : people)
-//        {
-//            if (person.id == id)
-//            {
-//                idTaken = true;
-//                break;
-//            }
-//        }
-//        if (!idTaken)
-//        {
-//            newPerson.id = id;
-//            idAssigned = true;
-//        } else id++;
-//    }
     if (people.empty())
     {
         newPerson.id = 1;
@@ -193,9 +365,8 @@ void addPerson(vector <Person> &people)
 
     sort(people.begin(), people.end(), comparePeopleId);
 
-    overrideFile(people);
+    overridePeopleFile(people);
     cout << endl << "Osoba zostala dodana" << endl; system("pause");
-//    return peopleNumber + 1;
 }
 
 
@@ -234,7 +405,7 @@ void readPeopleFromFile(vector <Person> &people)
     file.close();
 }
 
-void overrideFile (vector <Person> &people)
+void overridePeopleFile (vector <Person> &people)
 {
     fstream file;
     file.open("ksiazka_adresowa_nowy_format.txt", ios::out);
@@ -350,7 +521,7 @@ void erasePerson (vector <Person> &people)
             if (itr->id == personId)
             {
                 people.erase(itr);
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Adresat zostal usuniety." << endl;
                 foundId = true;
                 break;
@@ -398,7 +569,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Imie adresata zostalo zmienione." << endl;
                 break;
             }
@@ -415,7 +586,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Nazwisko adresata zostalo zmienione." << endl;
                 break;
             }
@@ -431,7 +602,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Numer telefonu adresata zostalo zmienione." << endl;
                 break;
             }
@@ -447,7 +618,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Email adresata zostalo zmienione." << endl;
                 break;
             }
@@ -463,7 +634,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFile(people);
+                overridePeopleFile(people);
                 cout << "Adres zamieszkania adresata zostalo zmienione." << endl;
                 break;
             }
