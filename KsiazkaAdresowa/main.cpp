@@ -43,6 +43,7 @@ int main()
     system("cls");
     while (run)
     {
+        system("cls");
         cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
         cout << "1. Dodaj adresata" << endl;
         cout << "2. Wyszukaj po imieniu" << endl;
@@ -58,27 +59,21 @@ int main()
         switch(choice)
         {
             case '1':
-                system("cls");
                 addPerson(people);
                 break;
             case '2':
-                system("cls");
                 showPeopleByName(people);
                 break;
             case '3':
-                system("cls");
                 showPeopleBySurname(people);
                 break;
             case '4':
-                system("cls");
                 showPeopleList(people);
                 break;
             case '5':
-                system("cls");
                 erasePerson(people);
                 break;
             case '6':
-                system("cls");
                 editPerson(people);
                 break;
             case '9':
@@ -155,47 +150,56 @@ void addPerson(vector <Person> &people)
     cout << "Podaj adres zamieszkania:";
     address = readLine();
 
-    Person newPerson;
-//    int id = 1;
-//    bool idTaken = false;
-//    bool idAssigned = false;
-//    while (!idAssigned)
-//    {
-//        idTaken = false;
-//
-//        for (Person &person : people)
-//        {
-//            if (person.id == id)
-//            {
-//                idTaken = true;
-//                break;
-//            }
-//        }
-//        if (!idTaken)
-//        {
-//            newPerson.id = id;
-//            idAssigned = true;
-//        } else id++;
-//    }
-    if (people.empty())
+    fstream file;
+    file.open("ksiazka_adresowa.txt", ios::in);
+
+    int lastId = 0;
+    if (file.good())
     {
-        newPerson.id = 1;
-    } else
-    {
-        newPerson.id = people.back().id + 1;
+        string line;
+        while(getline(file, line))
+        {
+            stringstream ss(line);
+            string idStr;
+            getline(ss, idStr, '|');
+            int id = stoi(idStr);
+            if (id > lastId)
+                lastId = id;
+        }
     }
+    file.close();
+
+    Person newPerson;
+
+    newPerson.id = lastId + 1;
     newPerson.name = name;
     newPerson.surname = surname;
     newPerson.phoneNumber = phoneNumber;
     newPerson.email = email;
     newPerson.address = address;
     people.push_back(newPerson);
-
     sort(people.begin(), people.end(), comparePeopleId);
 
-    overrideFile(people);
+    fstream fileOverride;
+    fileOverride.open("ksiazka_adresowa.txt", ios::out | ios::app);
+
+    if (fileOverride.good())
+    {
+        fileOverride
+        << newPerson.id << "|"
+        << newPerson.name << "|"
+        << newPerson.surname << "|"
+        << newPerson.phoneNumber << "|"
+        << newPerson.email << "|"
+        << newPerson.address << endl;
+        fileOverride.close();
+    }
+    else
+    {
+        cout << "Nie udalo sie otworzyc pliku do zapisu." << endl;
+    }
+    fileOverride.close();
     cout << endl << "Osoba zostala dodana" << endl; system("pause");
-//    return peopleNumber + 1;
 }
 
 
@@ -205,7 +209,7 @@ void readPeopleFromFile(vector <Person> &people)
     string line = "";
 
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::in);
+    file.open("ksiazka_adresowa.txt", ios::in);
 
     Person person;
     string data = "";
@@ -237,7 +241,7 @@ void readPeopleFromFile(vector <Person> &people)
 void overrideFile (vector <Person> &people)
 {
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::out);
+    file.open("ksiazka_adresowa.txt", ios::out);
 
     if (file.good())
     {
