@@ -670,7 +670,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Imie adresata zostalo zmienione." << endl;
                 break;
             }
@@ -688,7 +688,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Nazwisko adresata zostalo zmienione." << endl;
                 break;
             }
@@ -705,7 +705,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Numer telefonu adresata zostalo zmienione." << endl;
                 break;
             }
@@ -722,7 +722,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Email adresata zostalo zmienione." << endl;
                 break;
             }
@@ -739,7 +739,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Adres zamieszkania adresata zostalo zmienione." << endl;
                 break;
             }
