@@ -156,27 +156,6 @@ void addPerson(vector <Person> &people)
     address = readLine();
 
     Person newPerson;
-//    int id = 1;
-//    bool idTaken = false;
-//    bool idAssigned = false;
-//    while (!idAssigned)
-//    {
-//        idTaken = false;
-//
-//        for (Person &person : people)
-//        {
-//            if (person.id == id)
-//            {
-//                idTaken = true;
-//                break;
-//            }
-//        }
-//        if (!idTaken)
-//        {
-//            newPerson.id = id;
-//            idAssigned = true;
-//        } else id++;
-//    }
     if (people.empty())
     {
         newPerson.id = 1;
@@ -205,7 +184,7 @@ void readPeopleFromFile(vector <Person> &people)
     string line = "";
 
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::in);
+    file.open("ksiazka_adresowa.txt", ios::in);
 
     Person person;
     string data = "";
@@ -237,7 +216,7 @@ void readPeopleFromFile(vector <Person> &people)
 void overrideFile (vector <Person> &people)
 {
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::out);
+    file.open("ksiazka_adresowa.txt", ios::out);
 
     if (file.good())
     {
@@ -257,6 +236,52 @@ void overrideFile (vector <Person> &people)
         cout << "Nie udalo sie otworzyc pliku do zapisu." << endl;
         system("pause");
     }
+}
+
+void overrideFileByModify (vector <Person> &people,const Person &modifiedPerson)
+{
+    fstream file;
+    file.open("ksiazka_adresowa.txt", ios::in);
+
+    fstream tempFile;
+    tempFile.open("ksiazka_adresowa_tymczasowa.txt", ios::out);
+
+    string line = "";
+
+    if (!file.good() || !tempFile.good())
+    {
+        cout << "Nie udalo sie otworzyc plikow." << endl;
+        system("pause");
+        return;
+    }
+
+    while(getline(file, line))
+    {
+        stringstream ss(line);
+        string idStr;
+
+        getline(ss, idStr, '|');
+        int id = stoi(idStr);
+
+        if (modifiedPerson.id == stoi(idStr))
+        {
+            tempFile << modifiedPerson.id << "|";
+            tempFile << modifiedPerson.name << "|";
+            tempFile << modifiedPerson.surname << "|";
+            tempFile << modifiedPerson.phoneNumber << "|";
+            tempFile << modifiedPerson.email << "|";
+            tempFile << modifiedPerson.address << endl;
+        }
+        else
+        {
+            tempFile << line << endl;
+        }
+    }
+    file.close();
+    tempFile.close();
+
+    remove("ksiazka_adresowa.txt");
+    rename("ksiazka_adresowa_tymczasowa.txt", "ksiazka_adresowa.txt");
 }
 
 void showPeopleByName (vector <Person> &people)
@@ -384,6 +409,7 @@ void editPerson (vector <Person> &people)
 
 
         char choice = readChar();
+        Person modifiedPerson;
         switch(choice)
         {
             case '1':
@@ -395,10 +421,11 @@ void editPerson (vector <Person> &people)
                     if (person.id == personId)
                     {
                         person.name = readLine();
+                        modifiedPerson = person;
                         break;
                     }
                 }
-                overrideFile(people);
+                overrideFileByModify(people, modifiedPerson);
                 cout << "Imie adresata zostalo zmienione." << endl;
                 break;
             }
@@ -412,10 +439,11 @@ void editPerson (vector <Person> &people)
                     if (person.id == personId)
                     {
                         person.surname = readLine();
+                        modifiedPerson = person;
                         break;
                     }
                 }
-                overrideFile(people);
+                overrideFileByModify(people, modifiedPerson);
                 cout << "Nazwisko adresata zostalo zmienione." << endl;
                 break;
             }
@@ -428,10 +456,11 @@ void editPerson (vector <Person> &people)
                     if (person.id == personId)
                     {
                         person.phoneNumber = readLine();
+                        modifiedPerson = person;
                         break;
                     }
                 }
-                overrideFile(people);
+                overrideFileByModify(people, modifiedPerson);
                 cout << "Numer telefonu adresata zostalo zmienione." << endl;
                 break;
             }
@@ -444,10 +473,11 @@ void editPerson (vector <Person> &people)
                     if (person.id == personId)
                     {
                         person.email = readLine();
+                        modifiedPerson = person;
                         break;
                     }
                 }
-                overrideFile(people);
+                overrideFileByModify(people, modifiedPerson);
                 cout << "Email adresata zostalo zmienione." << endl;
                 break;
             }
@@ -460,10 +490,11 @@ void editPerson (vector <Person> &people)
                     if (person.id == personId)
                     {
                         person.address = readLine();
+                        modifiedPerson = person;
                         break;
                     }
                 }
-                overrideFile(people);
+                overrideFileByModify(people, modifiedPerson);
                 cout << "Adres zamieszkania adresata zostalo zmienione." << endl;
                 break;
             }
