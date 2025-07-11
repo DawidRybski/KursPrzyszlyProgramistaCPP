@@ -37,6 +37,8 @@ int readInt();
 void addPerson(vector <Person> &people);
 void readPeopleFromFile(vector <Person> &people);
 void overridePeopleFile (vector <Person> &people);
+void overrideFileByErase (const Person &erasedPerson);
+void overrideFileByModify (const Person &modifiedPerson);
 void showPeopleByName (vector <Person> &people);
 void showPeopleBySurname (vector <Person> &people);
 void showPeopleList (vector <Person> &people);
@@ -435,32 +437,48 @@ void readPeopleFromFile(vector <Person> &people)
     file.close();
 }
 
-void overridePeopleFile (vector <Person> &people)
+void overrideFileByErase (const Person &erasedPerson)
 {
     fstream file;
-    file.open("ksiazka_adresowa.txt", ios::out);
+    file.open("ksiazka_adresowa.txt", ios::in);
 
-    if (file.good())
+    fstream tempFile;
+    tempFile.open("ksiazka_adresowa_tymczasowa.txt", ios::out);
+
+    string line = "";
+
+    if (!file.good() || !tempFile.good())
     {
-        for (Person &person : people)
-        {
-            file << person.id << "|";
-            file << person.name << "|";
-            file << person.surname << "|";
-            file << person.phoneNumber << "|";
-            file << person.email << "|";
-            file << person.address << endl;
-        }
-        file.close();
-    }
-    else
-    {
-        cout << "Nie udalo sie otworzyc pliku do zapisu." << endl;
+        cout << "Nie udalo sie otworzyc plikow." << endl;
         system("pause");
+        return;
     }
+
+    while(getline(file, line))
+    {
+        stringstream ss(line);
+        string idStr;
+
+        getline(ss, idStr, '|');
+        int id = stoi(idStr);
+
+        if (erasedPerson.id == stoi(idStr))
+        {
+            continue;
+        }
+        else
+        {
+            tempFile << line << endl;
+        }
+    }
+    file.close();
+    tempFile.close();
+
+    remove("ksiazka_adresowa.txt");
+    rename("ksiazka_adresowa_tymczasowa.txt", "ksiazka_adresowa.txt");
 }
 
-void overrideFileByModify (vector <Person> &people,const Person &modifiedPerson)
+void overrideFileByModify (const Person &modifiedPerson)
 {
     fstream file;
     file.open("ksiazka_adresowa.txt", ios::in);
@@ -596,8 +614,8 @@ void erasePerson (vector <Person> &people)
         {
             if (itr->id == personId)
             {
+                overrideFileByErase(*itr);
                 people.erase(itr);
-                overridePeopleFile(people);
                 cout << "Adresat zostal usuniety." << endl;
                 foundId = true;
                 break;
@@ -607,6 +625,11 @@ void erasePerson (vector <Person> &people)
     else
     {
         cout << "Operacja usuniecia adresata zostala anulowana" << endl;
+    }
+
+    if (!foundId)
+    {
+        cout << "Nie znaleziono adresata o podanym ID." << endl;
     }
 
     system("pause");
