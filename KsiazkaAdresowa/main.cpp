@@ -60,7 +60,7 @@ int main()
         if (loggedUserId == 0)
         {
             system("cls");
-            cout << ">>> MENU GŁÓWNE <<<" << endl << endl;
+            cout << ">>> MENU GLOWNE <<<" << endl << endl;
             cout << "1. Rejestracja" << endl;
             cout << "2. Logowanie" << endl;
             cout << "9. Zakoncz program" << endl;
@@ -85,16 +85,18 @@ int main()
         {
             readPeopleFromFile(people);
             system("cls");
-            cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
+            cout << ">>> MENU UZYTKOWNIKA <<<" << endl;
+            cout << "----------------------------" << endl;
             cout << "1. Dodaj adresata" << endl;
             cout << "2. Wyszukaj po imieniu" << endl;
             cout << "3. Wyszukaj po nazwisku" << endl;
             cout << "4. Wyswietl wszystkich adresatow" << endl;
             cout << "5. Usun adresata" << endl;
             cout << "6. Edytuj adresata" << endl;
+            cout << "----------------------------" << endl;
             cout << "7. Zmiana hasla" << endl;
             cout << "8. Wyloguj sie" << endl;
-            cout << "9. Zakoncz program" << endl << endl;
+            cout << "----------------------------" << endl;
             cout << "Twoj wybor: ";
             choice = readChar();
 
@@ -131,9 +133,6 @@ int main()
                 case '8':
                     system("cls");
                     loggedUserId = 0;
-                    break;
-                case '9':
-                    run = false;
                     break;
             }
         }
