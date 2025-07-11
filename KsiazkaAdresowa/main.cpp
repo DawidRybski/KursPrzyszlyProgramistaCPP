@@ -12,6 +12,7 @@ using namespace std;
 struct Person
 {
     int id;
+    int userId;
     string name;
     string surname;
     string phoneNumber;
@@ -34,9 +35,8 @@ bool comparePeopleId(const Person &a, const Person &b);
 string readLine();
 char readChar();
 int readInt();
-void addPerson(vector <Person> &people);
-void readPeopleFromFile(vector <Person> &people);
-void overridePeopleFile (vector <Person> &people);
+void addPerson(vector <Person> &people, int loggedUserId);
+void readPeopleFromFile(vector <Person> &people, int loggedUserId);
 void overrideFileByErase (const Person &erasedPerson);
 void overrideFileByModify (const Person &modifiedPerson);
 void showPeopleByName (vector <Person> &people);
@@ -85,7 +85,7 @@ int main()
         }
         else
         {
-            readPeopleFromFile(people);
+            readPeopleFromFile(people, loggedUserId);
             system("cls");
             cout << ">>> MENU UZYTKOWNIKA <<<" << endl;
             cout << "----------------------------" << endl;
@@ -106,7 +106,7 @@ int main()
             {
                 case '1':
                     system("cls");
-                    addPerson(people);
+                    addPerson(people, loggedUserId);
                     break;
                 case '2':
                     system("cls");
@@ -331,7 +331,7 @@ int readInt()
     return number;
 }
 
-void addPerson(vector <Person> &people)
+void addPerson(vector <Person> &people, int loggedUserId)
 {
     string name, surname, phoneNumber, email, address;
     cout << "Podaj imie:";
@@ -370,6 +370,7 @@ void addPerson(vector <Person> &people)
 
     Person newPerson;
     newPerson.id = lastId + 1;
+    newPerson.userId = loggedUserId;
     newPerson.name = name;
     newPerson.surname = surname;
     newPerson.phoneNumber = phoneNumber;
@@ -385,6 +386,7 @@ void addPerson(vector <Person> &people)
     {
         fileOverride
         << newPerson.id << "|"
+        << newPerson.userId << "|"
         << newPerson.name << "|"
         << newPerson.surname << "|"
         << newPerson.phoneNumber << "|"
@@ -401,8 +403,7 @@ void addPerson(vector <Person> &people)
     cout << endl << "Osoba zostala dodana" << endl; system("pause");
 }
 
-
-void readPeopleFromFile(vector <Person> &people)
+void readPeopleFromFile(vector <Person> &people, int loggedUserId)
 {
     people.clear();
     string line = "";
@@ -423,16 +424,21 @@ void readPeopleFromFile(vector <Person> &people)
             switch (nextData)
             {
                 case 0: person.id = stoi(data); break;
-                case 1: person.name = data; break;
-                case 2: person.surname = data; break;
-                case 3: person.phoneNumber = data; break;
-                case 4: person.email = data; break;
-                case 5: person.address = data;
+                case 1: person.userId = stoi(data); break;
+                case 2: person.name = data; break;
+                case 3: person.surname = data; break;
+                case 4: person.phoneNumber = data; break;
+                case 5: person.email = data; break;
+                case 6: person.address = data;
             }
             nextData++;
             data = "";
         }
-        people.push_back(person);
+
+        if (person.userId == loggedUserId)
+        {
+            people.push_back(person);
+        }
     }
     file.close();
 }
@@ -670,7 +676,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Imie adresata zostalo zmienione." << endl;
                 break;
             }
@@ -688,7 +694,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Nazwisko adresata zostalo zmienione." << endl;
                 break;
             }
@@ -705,7 +711,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Numer telefonu adresata zostalo zmienione." << endl;
                 break;
             }
@@ -722,7 +728,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Email adresata zostalo zmienione." << endl;
                 break;
             }
@@ -739,7 +745,7 @@ void editPerson (vector <Person> &people)
                         break;
                     }
                 }
-                overrideFileByModify(people, modifiedPerson);
+                overrideFileByModify(modifiedPerson);
                 cout << "Adres zamieszkania adresata zostalo zmienione." << endl;
                 break;
             }
