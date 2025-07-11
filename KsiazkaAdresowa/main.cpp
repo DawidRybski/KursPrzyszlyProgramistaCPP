@@ -24,6 +24,7 @@ char readChar();
 int readInt();
 void addPerson(vector <Person> &people);
 void readPeopleFromFile(vector <Person> &people);
+void overrideFileByErase (const Person &erasedPerson);
 void overrideFile (vector <Person> &people);
 void showPeopleByName (vector <Person> &people);
 void showPeopleBySurname (vector <Person> &people);
@@ -205,7 +206,7 @@ void readPeopleFromFile(vector <Person> &people)
     string line = "";
 
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::in);
+    file.open("ksiazka_adresowa.txt", ios::in);
 
     Person person;
     string data = "";
@@ -234,10 +235,51 @@ void readPeopleFromFile(vector <Person> &people)
     file.close();
 }
 
+void overrideFileByErase (const Person &erasedPerson)
+{
+    fstream file;
+    file.open("ksiazka_adresowa.txt", ios::in);
+
+    fstream tempFile;
+    tempFile.open("ksiazka_adresowa_tymczasowa.txt", ios::out);
+
+    string line = "";
+
+    if (!file.good() || !tempFile.good())
+    {
+        cout << "Nie udalo sie otworzyc plikow." << endl;
+        system("pause");
+        return;
+    }
+
+    while(getline(file, line))
+    {
+        stringstream ss(line);
+        string idStr;
+
+        getline(ss, idStr, '|');
+        int id = stoi(idStr);
+
+        if (erasedPerson.id == stoi(idStr))
+        {
+            continue;
+        }
+        else
+        {
+            tempFile << line << endl;
+        }
+    }
+    file.close();
+    tempFile.close();
+
+    remove("ksiazka_adresowa.txt");
+    rename("ksiazka_adresowa_tymczasowa.txt", "ksiazka_adresowa.txt");
+}
+
 void overrideFile (vector <Person> &people)
 {
     fstream file;
-    file.open("ksiazka_adresowa_nowy_format.txt", ios::out);
+    file.open("ksiazka_adresowa.txt", ios::out);
 
     if (file.good())
     {
@@ -349,8 +391,8 @@ void erasePerson (vector <Person> &people)
         {
             if (itr->id == personId)
             {
+                overrideFileByErase(*itr);
                 people.erase(itr);
-                overrideFile(people);
                 cout << "Adresat zostal usuniety." << endl;
                 foundId = true;
                 break;
@@ -360,6 +402,11 @@ void erasePerson (vector <Person> &people)
     else
     {
         cout << "Operacja usuniecia adresata zostala anulowana" << endl;
+    }
+
+    if (!foundId)
+    {
+        cout << "Nie znaleziono adresata o podanym ID." << endl;
     }
 
     system("pause");
