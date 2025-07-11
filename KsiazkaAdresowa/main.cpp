@@ -512,6 +512,7 @@ void overrideFileByModify (const Person &modifiedPerson)
         if (modifiedPerson.id == stoi(idStr))
         {
             tempFile << modifiedPerson.id << "|";
+            tempFile << modifiedPerson.userId << "|";
             tempFile << modifiedPerson.name << "|";
             tempFile << modifiedPerson.surname << "|";
             tempFile << modifiedPerson.phoneNumber << "|";
