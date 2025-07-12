@@ -646,7 +646,24 @@ void editPerson (vector <Person> &people)
 {
     cout << "Wprowadz id adresata, ktorego chcesz edytowac: ";
     int personId = readInt();
-    bool runEditPerson = true;
+    bool runEditPerson = false;
+
+    for (Person &person : people)
+    {
+        if (person.id == personId)
+        {
+            runEditPerson = true;
+            break;
+        }
+    }
+
+    if (runEditPerson == false)
+    {
+        cout << "Nie znaleziono adresata o podanym id." << endl;
+        system("pause");
+        return;
+    }
+
 
     while (runEditPerson)
     {
