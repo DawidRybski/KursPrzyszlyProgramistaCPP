@@ -612,6 +612,21 @@ void erasePerson (vector <Person> &people)
     int personId = readInt();
     bool foundId = false;
 
+    for (Person person: people)
+    {
+        if (person.id == personId)
+        {
+            foundId = true;
+        }
+    }
+
+    if (!foundId)
+    {
+        cout << "Nie znaleziono adresata o podanym ID." << endl;
+        system("pause");
+        return;
+    }
+
     cout << "Czy na pewno chcesz usunac adresata? (Wprowadz 't', aby potwierdzic lub inny znak, aby anulowac operacje):";
     char confirmation = readChar();
 
@@ -632,11 +647,6 @@ void erasePerson (vector <Person> &people)
     else
     {
         cout << "Operacja usuniecia adresata zostala anulowana" << endl;
-    }
-
-    if (!foundId)
-    {
-        cout << "Nie znaleziono adresata o podanym ID." << endl;
     }
 
     system("pause");
